@@ -100,8 +100,9 @@ A simple solution is to use CSS: `position: fixed` on the list and calculat its 
   </template>
 ```
 
-`portal` attribute may seem tobe an overkill, but it helps you separate DOM path of different parts in your custom element, whist still binds them
-to the same underlying view model, which should helps better DOM manangement, including event model in some cases. Following is an example of final rendered DOM tree for `<combobox/>` above:
+`portal` attribute may seem to be an overkill, but beside styling, it also helps you separate DOM path of different parts in your custom element,
+whist still binds them to the same underlying view model, which should helps better DOM manangement, including event model in some cases.
+Following is an example of final rendered DOM tree for `<combobox/>` above:
 
 ```html
   <body>
