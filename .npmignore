@@ -1,0 +1,14 @@
+jspm_packages
+bower_components
+.idea
+.vscode
+.circleci
+src
+test
+gulpfile.js
+karma.conf.js
+config.js
+tsconfig.json
+tslint.json
+CONTRIBUTING.md
+ISSUE_TEMPLATE.md
