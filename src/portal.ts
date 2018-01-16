@@ -11,14 +11,25 @@ import { PLATFORM } from 'aurelia-pal';
 
 const document: Document = PLATFORM.global.document;
 
+type PortalTarget = string | Element | null | undefined
+
 @templateController()
 @customAttribute('portal')
 export class Portal {
 
-  private static getTarget(target: string | Element | null | undefined): Element | null {
+  private static getTarget(target: PortalTarget, context?: PortalTarget): Element | null {
     if (target) {
       if (typeof target === 'string') {
-        target = document.querySelector(target);
+        let queryContext: Element | Document = document;
+        if (context) {
+          if (typeof context === 'string') {
+            context = document.querySelector(context);
+          }
+          if (context !== null && (context instanceof Element)) {
+            queryContext = context;
+          }
+        }
+        target = queryContext.querySelector(target);
       }
       if (target && (target instanceof Element)) {
         return target;
@@ -41,6 +52,7 @@ export class Portal {
   })
   public target: string | Element | null | undefined;
 
+  @bindable({ changeHandler: 'targetChanged' }) public renderContext: string | Element | null | undefined;
   @bindable() public strict: boolean = false;
   @bindable() public initialRender: boolean = false;
 
@@ -83,7 +95,7 @@ export class Portal {
   }
 
   private getTarget(): Element | null {
-    let target = Portal.getTarget(this.target);
+    let target = Portal.getTarget(this.target, this.renderContext);
     if (target === null) {
       if (this.strict) {
         throw new Error('Render target not found.');

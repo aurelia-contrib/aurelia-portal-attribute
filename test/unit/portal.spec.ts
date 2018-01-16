@@ -36,6 +36,9 @@ describe('Portal attribute', () => {
         h('div', { class: 'square1' }),
         h('div', { class: 'square2' }),
         h('div', { class: 'square3' }),
+        h('div', { class: 'round' },
+          h('div', { id: 'square1', class: 'square1' })
+        ),
         h('div', { id: 'portal-container-element' },
           viewSlotAnchor = document.createComment('anchor')
         )
@@ -105,6 +108,27 @@ describe('Portal attribute', () => {
       portal.attached();
 
       expect(document.querySelector('.square3 form')).not.toBeFalsy();
+    });
+
+    it('renders with renderContext', () => {
+      portal.target = '.square1';
+      portal.renderContext = '.round';
+
+      portal.bind(bindingContext, overrideContext);
+      portal.attached();
+
+      expect(document.querySelector('.round form')).not.toBeFalsy();
+    });
+
+    it('renders to first square with renderContext selector query with no result', () => {
+      portal.target = '.square1';
+      portal.renderContext = '.super-round';
+
+      portal.bind(bindingContext, overrideContext);
+      portal.attached();
+
+      expect(document.querySelector('.round form')).toBe(null);
+      expect(document.querySelector('.square1 form')).not.toBeFalsy();
     });
 
     it('re-renders after target has changed', () => {
