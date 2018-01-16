@@ -1,3 +1,2 @@
-import { Blur, BlurConfig } from './blur';
-export declare function configure(frameworkConfig: any, blurConfig: BlurConfig): void;
-export { Blur, BlurConfig };
+export { Portal } from './portal';
+export declare function configure(frameworkConfig: any): void;

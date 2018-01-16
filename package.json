@@ -31,7 +31,7 @@
     "prebuild": "cross-env rimraf dist",
     "build": "concurrently \"npm run build:amd\" \"npm run build:commonjs\" \"npm run build:es2015\" \"npm run build:native-modules\" \"npm run build:system\"",
     "prepare-release": "cross-env npm run build && semantic-release pre && npm publish && semantic-release post",
-    "semantic-release": "semantic-release"
+    "semantic-release": "npm run build && semantic-release"
   },
   "repository": {
     "type": "git",
