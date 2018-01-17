@@ -155,6 +155,20 @@ describe('Portal attribute', () => {
       expect(document.querySelector('.square3 form')).not.toBeFalsy();
     });
 
+    it('does not render when not attached', () => {
+      portal.bind(bindingContext, overrideContext);
+
+      portal.targetChanged();
+
+      expect(document.querySelector('form')).toBe(null);
+      expect((portal as any).viewSlot).toBe(undefined);
+
+      portal.attached();
+      expect(document.querySelector('form')).not.toBeFalsy();
+
+      portal.detached();
+    });
+
     it('throws in strict mode', () => {
       portal.strict = true;
       portal.target = '.square4';

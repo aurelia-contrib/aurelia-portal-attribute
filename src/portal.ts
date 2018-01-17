@@ -88,7 +88,7 @@ export class Portal {
 
   public detached() {
     this.isAttached = false;
-    this.view.detached();
+    this.viewSlot!.detached();
   }
 
   public unbind() {
@@ -114,10 +114,8 @@ export class Portal {
     const target = this.getTarget();
     const oldViewSlot = this.viewSlot;
     if (oldViewSlot) {
-      oldViewSlot.removeAt(0, false, false);
-      if (this.isAttached) {
-        view.detached();
-      }
+      oldViewSlot.remove(view);
+      this.viewSlot = null;
     }
     if (this.isAttached) {
       const viewSlot = this.viewSlot = new ViewSlot(target!, true);
