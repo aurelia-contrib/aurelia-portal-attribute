@@ -25,13 +25,13 @@ export class Portal {
           if (typeof context === 'string') {
             context = document.querySelector(context);
           }
-          if (context !== null && (context instanceof Element)) {
+          if (context instanceof Element) {
             queryContext = context;
           }
         }
         target = queryContext.querySelector(target);
       }
-      if (target && (target instanceof Element)) {
+      if (target instanceof Element) {
         return target;
       }
     }
@@ -67,7 +67,10 @@ export class Portal {
   }
 
   public bind(bindingContext: any, overrideContext: OverrideContext) {
-    const view = this.view = this.viewFactory.create();
+    let view = this.view;
+    if (!view) {
+      view = this.view = this.viewFactory.create();
+    }
     const shouldInitRender = this.initialRender;
     if (shouldInitRender) {
       this.originalViewslot.add(view);
@@ -111,15 +114,15 @@ export class Portal {
     const target = this.getTarget();
     const oldViewSlot = this.viewSlot;
     if (oldViewSlot) {
-      oldViewSlot.remove(view);
+      oldViewSlot.removeAt(0, false, false);
       if (this.isAttached) {
         view.detached();
       }
     }
     if (this.isAttached) {
       const viewSlot = this.viewSlot = new ViewSlot(target!, true);
+      viewSlot.attached();
       viewSlot.add(view);
-      view.attached();
     }
   }
 

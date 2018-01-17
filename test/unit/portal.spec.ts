@@ -80,7 +80,18 @@ describe('Portal attribute', () => {
     expect(view.overrideContext).toBe(overrideContext);
   });
 
-  it('bind and init render', () => {
+  it('caches view', () => {
+    portal.bind(bindingContext, overrideContext);
+
+    let _view1 = (portal as any).view;
+
+    portal.bind(bindingContext, overrideContext);
+    let _view2 = (portal as any).view;
+
+    expect(_view1).toBe(_view2);
+  });
+
+  it('binds and inits render', () => {
     portal.initialRender = true;
     spyOn(originalViewSlot, 'add').and.callThrough();
     spyOn(originalViewSlot, 'remove').and.callThrough();
