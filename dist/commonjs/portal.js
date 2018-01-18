@@ -17,19 +17,34 @@ var Portal = /** @class */ (function () {
         this.initialRender = false;
     }
     Portal_1 = Portal;
-    Portal.getTarget = function (target) {
+    Portal.getTarget = function (target, context) {
         if (target) {
             if (typeof target === 'string') {
-                target = document.querySelector(target);
+                var queryContext = document;
+                if (context) {
+                    if (typeof context === 'string') {
+                        context = document.querySelector(context);
+                    }
+                    if (context instanceof Element) {
+                        queryContext = context;
+                    }
+                }
+                target = queryContext.querySelector(target);
             }
-            if (target && (target instanceof Element)) {
+            if (target instanceof Element) {
                 return target;
             }
         }
         return null;
     };
     Portal.prototype.bind = function (bindingContext, overrideContext) {
-        var view = this.view = this.viewFactory.create();
+        if (!this.callbackContext) {
+            this.callbackContext = bindingContext;
+        }
+        var view = this.view;
+        if (!view) {
+            view = this.view = this.viewFactory.create();
+        }
         var shouldInitRender = this.initialRender;
         if (shouldInitRender) {
             this.originalViewslot.add(view);
@@ -41,19 +56,24 @@ var Portal = /** @class */ (function () {
     };
     Portal.prototype.attached = function () {
         this.isAttached = true;
-        this.render();
+        return this.render();
     };
     Portal.prototype.detached = function () {
         this.isAttached = false;
-        this.view.detached();
+        if (this.viewSlot) {
+            this.viewSlot.detached();
+        }
     };
     Portal.prototype.unbind = function () {
-        this.viewSlot.remove(this.view);
+        if (this.viewSlot) {
+            this.viewSlot.remove(this.view);
+            this.viewSlot = null;
+        }
         this.view.unbind();
-        this.viewSlot = null;
+        this.callbackContext = null;
     };
     Portal.prototype.getTarget = function () {
-        var target = Portal_1.getTarget(this.target);
+        var target = Portal_1.getTarget(this.target, this.renderContext);
         if (target === null) {
             if (this.strict) {
                 throw new Error('Render target not found.');
@@ -65,23 +85,53 @@ var Portal = /** @class */ (function () {
         return target;
     };
     Portal.prototype.render = function () {
+        var _this = this;
+        var oldTarget = this.currentTarget;
         var view = this.view;
-        var target = this.getTarget();
+        var target = this.currentTarget = this.getTarget();
         var oldViewSlot = this.viewSlot;
-        if (oldViewSlot) {
-            oldViewSlot.remove(view);
-            if (this.isAttached) {
-                view.detached();
+        if (oldTarget === target && oldViewSlot) {
+            return;
+        }
+        var addAction = function () {
+            if (_this.isAttached) {
+                return Promise.resolve(typeof _this.activating === 'function'
+                    ? _this.activating.call(_this.callbackContext, target, view)
+                    : null).then(function () {
+                    if (target === _this.currentTarget || oldTarget === unset) {
+                        var viewSlot = _this.viewSlot = new aurelia_templating_1.ViewSlot(target, true);
+                        viewSlot.attached();
+                        viewSlot.add(view);
+                        _this.removed = false;
+                    }
+                    return Promise.resolve().then(function () {
+                        typeof _this.activated === 'function'
+                            ? _this.activated.call(_this.callbackContext, target, view)
+                            : null;
+                    });
+                });
             }
+            return Promise.resolve(null);
+        };
+        if (oldViewSlot) {
+            return Promise.resolve(typeof this.deactivating === 'function'
+                ? this.deactivating.call(this.callbackContext, oldTarget, view)
+                : null).then(function () {
+                if (typeof _this.deactivated === 'function') {
+                    _this.deactivated.call(_this.callbackContext, oldTarget, view);
+                }
+                _this.viewSlot = null;
+                if (!_this.removed) {
+                    oldViewSlot.remove(view);
+                    _this.removed = true;
+                }
+                return addAction();
+            });
         }
-        if (this.isAttached) {
-            var viewSlot = this.viewSlot = new aurelia_templating_1.ViewSlot(target, true);
-            viewSlot.add(view);
-            view.attached();
-        }
+        return Promise.resolve(addAction());
     };
     Portal.prototype.targetChanged = function () {
-        this.render();
+        return this.render();
     };
     /**
      * Only needs the BoundViewFactory as a custom viewslot will be used
@@ -94,11 +144,29 @@ var Portal = /** @class */ (function () {
         })
     ], Portal.prototype, "target", void 0);
     __decorate([
+        aurelia_templating_1.bindable({ changeHandler: 'targetChanged' })
+    ], Portal.prototype, "renderContext", void 0);
+    __decorate([
         aurelia_templating_1.bindable()
     ], Portal.prototype, "strict", void 0);
     __decorate([
         aurelia_templating_1.bindable()
     ], Portal.prototype, "initialRender", void 0);
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], Portal.prototype, "deactivating", void 0);
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], Portal.prototype, "activating", void 0);
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], Portal.prototype, "activated", void 0);
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], Portal.prototype, "deactivated", void 0);
+    __decorate([
+        aurelia_templating_1.bindable()
+    ], Portal.prototype, "callbackContext", void 0);
     Portal = Portal_1 = __decorate([
         aurelia_templating_1.templateController(),
         aurelia_templating_1.customAttribute('portal')
@@ -107,3 +175,4 @@ var Portal = /** @class */ (function () {
     var Portal_1;
 }());
 exports.Portal = Portal;
+var unset = {};
