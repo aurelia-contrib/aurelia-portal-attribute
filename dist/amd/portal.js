@@ -14,6 +14,7 @@ define(["require", "exports", "aurelia-templating", "aurelia-pal"], function (re
             this.originalViewslot = originalViewslot;
             this.strict = false;
             this.initialRender = false;
+            this.currentTarget = unset;
         }
         Portal_1 = Portal;
         Portal.getTarget = function (target, context) {

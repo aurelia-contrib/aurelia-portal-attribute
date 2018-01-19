@@ -25,6 +25,7 @@ System.register(["aurelia-templating", "aurelia-pal"], function (exports_1, cont
                     this.originalViewslot = originalViewslot;
                     this.strict = false;
                     this.initialRender = false;
+                    this.currentTarget = unset;
                 }
                 Portal_1 = Portal;
                 Portal.getTarget = function (target, context) {

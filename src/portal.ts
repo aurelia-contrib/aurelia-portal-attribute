@@ -79,7 +79,7 @@ export class Portal {
    */
   @bindable() public callbackContext: any
 
-  private currentTarget: typeof unset | Element | null
+  private currentTarget: typeof unset | Element | null = unset;
   private isAttached: boolean;
   private viewSlot: ViewSlot | null;
   private view: View;
