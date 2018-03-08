@@ -25,7 +25,7 @@ npm install aurelia-portal-attribute --save
 If you use the **Aurelia CLI**, install the plugin with the following command
 
 ```shell
-au import aurelia-portal-attribute
+au install aurelia-portal-attribute
 ```
 
 alternatively you can manually add these dependencies to your vendor bundle:
