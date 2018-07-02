@@ -1,7 +1,6 @@
-import { PLATFORM } from 'aurelia-pal';
-
-export { Portal } from './portal';
+import { Portal } from './portal';
+export { Portal, PortalLifecycleCallback } from './portal';
 
 export function configure(frameworkConfig: any) {
-  frameworkConfig.globalResources(PLATFORM.moduleName('./portal'));
+  frameworkConfig.globalResources(Portal);
 }

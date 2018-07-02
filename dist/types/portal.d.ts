@@ -8,7 +8,7 @@ export declare class Portal {
     /**
      * Only needs the BoundViewFactory as a custom viewslot will be used
      */
-    static inject: (typeof ViewSlot | typeof BoundViewFactory)[];
+    static inject: (typeof BoundViewFactory | typeof ViewSlot)[];
     /**
      * Target to render to, CSS string | Element
      */
