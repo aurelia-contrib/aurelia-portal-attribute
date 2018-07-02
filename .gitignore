@@ -4,5 +4,6 @@ bower_components
 .idea
 .DS_STORE
 .vscode
+.rollupcache
 build
 test/coverage-jest

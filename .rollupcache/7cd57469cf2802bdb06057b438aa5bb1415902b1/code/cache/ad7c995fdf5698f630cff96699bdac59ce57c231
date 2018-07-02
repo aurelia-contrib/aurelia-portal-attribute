@@ -1,1 +1,0 @@
-{"code":"import { Portal } from './portal';\r\nexport { Portal } from './portal';\r\nexport function configure(frameworkConfig) {\r\n    frameworkConfig.globalResources(Portal);\r\n}\r\n"}
