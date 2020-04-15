@@ -10,35 +10,14 @@ This article covers the portal attribute plugin for Aurelia. This plugin is crea
 
 ## [Installing The Plugin]
 
-1. In your **JSPM**-based project install the plugin via `jspm` with following command
-
-```shell
-jspm install aurelia-portal-attribute
-```
-
-If you use **Webpack**, install the plugin with the following command
-
 ```shell
 npm install aurelia-portal-attribute --save
 ```
 
-If you use the **Aurelia CLI**, install the plugin with the following command
+If you use **JSPM**, install the plugin via `jspm` with following command
 
 ```shell
-au install aurelia-portal-attribute
-```
-
-alternatively you can manually add these dependencies to your vendor bundle:
-
-```json
-  ...
-  "dependencies": [
-    {
-      "name": "aurelia-portal-attribute",
-      "path": "../node_modules/aurelia-portal-attribute/dist/amd",
-      "main": "aurelia-portal-attribute"
-    }
-  ]
+jspm install aurelia-portal-attribute
 ```
 
 2. Make sure you use [manual bootstrapping](http://aurelia.io/docs#startup-and-configuration). In order to do so open your `index.html` and locate the element with the attribute aurelia-app. Change it to look like this:
