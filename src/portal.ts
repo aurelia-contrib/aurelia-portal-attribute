@@ -13,7 +13,19 @@ const document: Document = PLATFORM.global.document;
 
 type PortalTarget = string | Element | null | undefined
 
+/**
+ * Indicates where to insert a portalled view. Aligns with webapi for insertion
+ */
+type InsertPosition = 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend';
+
 export type PortalLifecycleCallback = (target: Element, view: View) => Promise<any> | any;
+
+const validPositions = {
+  beforebegin: 1,
+  afterbegin: 1,
+  beforeend: 1,
+  afterend: 1
+};
 
 @templateController()
 @customAttribute('portal')
@@ -40,6 +52,21 @@ export class Portal {
     return null;
   }
 
+  private static createViewSlot(position: InsertPosition, target: Element): ViewSlot {
+    if (typeof position !== 'string' || validPositions[position.toLowerCase()] !== 1) {
+      throw new Error('Invalid position for portalling. Expected one of "beforebegin", "afterbegin", "beforeend" or "afterend".');
+    }
+    const anchorCommentHolder = document.createElement('portal-placeholder');
+    const normalizedPosition = position.toLowerCase() as InsertPosition;
+    target.insertAdjacentElement(normalizedPosition, anchorCommentHolder);
+    const anchorComment = document.createComment('portal');
+    // If the position is beforeBegin or aftrEnd,
+    // then anchorCommentHolder wont be a child of target
+    // In all situations, it's always correct to use anchorCommentHolder rather than target
+    anchorCommentHolder.parentNode!.replaceChild(anchorComment, anchorCommentHolder);
+    return new ViewSlot(anchorComment, false);
+  }
+
   /**
    * Only needs the BoundViewFactory as a custom viewslot will be used
    */
@@ -54,26 +81,42 @@ export class Portal {
   })
   public target: string | Element | null | undefined;
 
-  @bindable({ changeHandler: 'targetChanged' }) public renderContext: string | Element | null | undefined;
-  @bindable() public strict: boolean = false;
-  @bindable() public initialRender: boolean = false;
+  /**
+   * Insertion position. See https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+   * for explanation of what the possible values mean.
+   * 
+   * Possible values are (case insensitive): `beforeBegin` | `afterBegin` | `beforeEnd` | `afterEnd`
+   * 
+   * Default value is `beforeEnd`
+   */
+  @bindable({ changeHandler: 'targetChanged' })
+  public position: InsertPosition = 'beforeend';
+
+  @bindable({ changeHandler: 'targetChanged' })
+  public renderContext: string | Element | null | undefined;
+
+  @bindable()
+  public strict: boolean = false;
+
+  @bindable()
+  public initialRender: boolean = false;
 
   /**
    * Will be called when the attribute receive new target after the first render.
    */
-  @bindable() public deactivating: PortalLifecycleCallback
+  @bindable() public deactivating: PortalLifecycleCallback;
   /**
    * Will be called after `portaled` element has been added to target
    */
-  @bindable() public activating: PortalLifecycleCallback
+  @bindable() public activating: PortalLifecycleCallback;
   /**
    * Will be called after activating has been resolved
    */
-  @bindable() public activated: PortalLifecycleCallback
+  @bindable() public activated: PortalLifecycleCallback;
   /**
    * Will be called after deactivating has been resolved.
    */
-  @bindable() public deactivated: PortalLifecycleCallback
+  @bindable() public deactivated: PortalLifecycleCallback;
   /**
    * The object that will becontextwhen calling life cycle methods above
    */
@@ -142,7 +185,7 @@ export class Portal {
     return target;
   }
 
-  private render() {
+  private render(): void | Promise<any> {
     const oldTarget = this.currentTarget;
     const view = this.view;
     const target = this.currentTarget = this.getTarget();
@@ -152,7 +195,7 @@ export class Portal {
       return;
     }
 
-    let addAction = () => {
+    const addAction = () => {
       if (this.isAttached) {
         return Promise.resolve(
           typeof this.activating === 'function'
@@ -160,7 +203,7 @@ export class Portal {
             : null
         ).then(() => {
           if (target === this.currentTarget || oldTarget === unset) {
-            const viewSlot = this.viewSlot = new ViewSlot(target!, true);
+            const viewSlot = this.viewSlot = Portal.createViewSlot(this.position, target!); // new ViewSlot(target!, true);
             viewSlot.attached();
             viewSlot.add(view);
             this.removed = false;
