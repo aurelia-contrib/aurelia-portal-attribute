@@ -13,6 +13,7 @@ function configRollup(isProduction) {
         tsconfigOverride: {
           compilerOptions: {
             target: 'es2015',
+            declaration: true,
             declarationDir: 'dist/types'
           }
         },
@@ -32,8 +33,7 @@ function configRollup(isProduction) {
         typescript({
           tsconfigOverride: {
             compilerOptions: {
-              declaration: false,
-              declarationDir: null
+              target: 'es5'
             }
           },
           cacheRoot: '.rollupcache',
