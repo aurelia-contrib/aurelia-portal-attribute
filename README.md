@@ -122,9 +122,29 @@ Following is an example of final rendered DOM tree for `<combobox/>` above:
   </body>
 ```
 
-## Usage Examples / Scenarios
+## APIs
 
-TODO
+| Name | Types | Default | Description |
+| - | - | - | - |
+| target | string/Element | undefined | Target of the portal, by default will be resolved to document body, if target cannot be found.<br> If a string is supplied, it will be used to determine the real target with a call `document.querySelector()` |
+| position | `beforebegin` or `afterbegin` or `beforeend` or `afterend` | `beforeend` | Describing the position relative to the target of a portal to move the content to |
+
+### Examples
+
+Portalling an element to document body
+```html
+<div class="my-menu" portal>
+or
+<div class="my-menu" portal="body">
+```
+
+Portalling multiple elements to the end of document body
+```html
+<template portal>
+  <p>paragraph 1</p>
+  <p>paragraph 2</p>
+</template>
+```
 
 ## Building The Code
 
