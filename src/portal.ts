@@ -31,6 +31,7 @@ const validPositions = {
 @customAttribute('portal')
 export class Portal {
 
+  /**@internal */
   private static getTarget(target: PortalTarget, context?: PortalTarget): Element | null {
     if (target) {
       if (typeof target === 'string') {
@@ -52,6 +53,7 @@ export class Portal {
     return null;
   }
 
+  /**@internal */
   private static createViewSlot(position: InsertPosition, target: Element): ViewSlot {
     if (typeof position !== 'string' || validPositions[position.toLowerCase()] !== 1) {
       throw new Error('Invalid position for portalling. Expected one of "beforebegin", "afterbegin", "beforeend" or "afterend".');
@@ -69,6 +71,7 @@ export class Portal {
 
   /**
    * Only needs the BoundViewFactory as a custom viewslot will be used
+   * @internal
    */
   public static inject = [BoundViewFactory, ViewSlot];
 
@@ -122,10 +125,15 @@ export class Portal {
    */
   @bindable() public callbackContext: any
 
+  /**@internal */
   private currentTarget: typeof unset | Element | null = unset;
+  /**@internal */
   private isAttached: boolean;
+  /**@internal */
   private viewSlot: ViewSlot | null;
+  /**@internal */
   private view: View;
+  /**@internal */
   private removed: boolean;
 
   constructor(

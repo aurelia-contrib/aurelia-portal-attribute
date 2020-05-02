@@ -15,7 +15,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
-    "noEmitHelpers": false
+    "noEmitHelpers": false,
+    "stripInternal": true
   },
   "exclude": [
     ".vscode",
