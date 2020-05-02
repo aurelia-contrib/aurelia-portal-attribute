@@ -1,6 +1,6 @@
 {
   "name": "aurelia-portal-attribute",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A plugin to customize rendering process in Aurelia application.",
   "keywords": [
     "aurelia",
