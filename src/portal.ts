@@ -137,11 +137,14 @@ export class Portal {
   private removed: boolean;
 
   constructor(
+    /**@internal */
     private viewFactory: BoundViewFactory,
+    /**@internal */
     private originalViewslot: ViewSlot
   ) {
   }
 
+  /**@internal */
   public bind(bindingContext: any, overrideContext: OverrideContext) {
     if (!this.callbackContext) {
       this.callbackContext = bindingContext;
@@ -160,11 +163,13 @@ export class Portal {
     }
   }
 
+  /**@internal*/
   public attached() {
     this.isAttached = true;
     return this.render();
   }
 
+  /**@internal */
   public detached() {
     this.isAttached = false;
     if (this.viewSlot) {
@@ -172,6 +177,7 @@ export class Portal {
     }
   }
 
+  /**@internal */
   public unbind() {
     if (this.viewSlot) {
       this.viewSlot.remove(this.view);
@@ -181,6 +187,7 @@ export class Portal {
     this.callbackContext = null;
   }
 
+  /**@internal */
   private getTarget(): Element | null {
     let target = Portal.getTarget(this.target, this.renderContext);
     if (target === null) {
@@ -193,6 +200,7 @@ export class Portal {
     return target;
   }
 
+  /**@internal */
   private render(): void | Promise<any> {
     const oldTarget = this.currentTarget;
     const view = this.view;
@@ -246,6 +254,7 @@ export class Portal {
     return Promise.resolve(addAction());
   }
 
+  /**@internal */
   public targetChanged() {
     return this.render();
   }
