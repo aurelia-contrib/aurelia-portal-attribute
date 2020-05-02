@@ -1,3 +1,4 @@
+import './setup';
 import { OverrideContext, createOverrideContext } from 'aurelia-binding';
 import { Container } from 'aurelia-dependency-injection';
 import { PLATFORM, DOM } from 'aurelia-pal';
@@ -9,8 +10,8 @@ import {
   View
 } from 'aurelia-templating';
 
-import { markupToElement } from './util';
-import { Portal } from '../../src/portal';
+import { markupToElement } from './utils';
+import { Portal } from '../src/portal';
 
 describe('Portal attribute', () => {
 
