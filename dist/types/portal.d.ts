@@ -1,18 +1,23 @@
-import { OverrideContext } from 'aurelia-binding';
 import { ViewSlot, BoundViewFactory, View } from 'aurelia-templating';
+/**
+ * Indicates where to insert a portalled view. Aligns with webapi for insertion
+ */
+declare type InsertPosition = 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend';
 export declare type PortalLifecycleCallback = (target: Element, view: View) => Promise<any> | any;
 export declare class Portal {
-    private viewFactory;
-    private originalViewslot;
-    private static getTarget(target, context?);
-    /**
-     * Only needs the BoundViewFactory as a custom viewslot will be used
-     */
-    static inject: (typeof BoundViewFactory | typeof ViewSlot)[];
     /**
      * Target to render to, CSS string | Element
      */
     target: string | Element | null | undefined;
+    /**
+     * Insertion position. See https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+     * for explanation of what the possible values mean.
+     *
+     * Possible values are (case insensitive): `beforeBegin` | `afterBegin` | `beforeEnd` | `afterEnd`
+     *
+     * Default value is `beforeEnd`
+     */
+    position: InsertPosition;
     renderContext: string | Element | null | undefined;
     strict: boolean;
     initialRender: boolean;
@@ -36,17 +41,10 @@ export declare class Portal {
      * The object that will becontextwhen calling life cycle methods above
      */
     callbackContext: any;
-    private currentTarget;
-    private isAttached;
-    private viewSlot;
-    private view;
-    private removed;
-    constructor(viewFactory: BoundViewFactory, originalViewslot: ViewSlot);
-    bind(bindingContext: any, overrideContext: OverrideContext): void;
-    attached(): Promise<void | null> | undefined;
-    detached(): void;
-    unbind(): void;
-    private getTarget();
-    private render();
-    targetChanged(): Promise<void | null> | undefined;
+    constructor(
+    /**@internal */
+    viewFactory: BoundViewFactory, 
+    /**@internal */
+    originalViewslot: ViewSlot);
 }
+export {};

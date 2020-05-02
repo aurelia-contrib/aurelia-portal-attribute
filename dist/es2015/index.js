@@ -1,4 +1,4 @@
-import { customAttribute, templateController, ViewSlot, BoundViewFactory, bindable } from 'aurelia-templating';
+import { ViewSlot, BoundViewFactory, bindable, templateController, customAttribute } from 'aurelia-templating';
 import { PLATFORM } from 'aurelia-pal';
 
 /*! *****************************************************************************
@@ -23,15 +23,37 @@ function __decorate(decorators, target, key, desc) {
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 }
 
+var Portal_1;
 const document = PLATFORM.global.document;
+const validPositions = {
+    beforebegin: 1,
+    afterbegin: 1,
+    beforeend: 1,
+    afterend: 1
+};
 let Portal = Portal_1 = class Portal {
-    constructor(viewFactory, originalViewslot) {
+    constructor(
+    /**@internal */
+    viewFactory, 
+    /**@internal */
+    originalViewslot) {
         this.viewFactory = viewFactory;
         this.originalViewslot = originalViewslot;
+        /**
+         * Insertion position. See https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+         * for explanation of what the possible values mean.
+         *
+         * Possible values are (case insensitive): `beforeBegin` | `afterBegin` | `beforeEnd` | `afterEnd`
+         *
+         * Default value is `beforeEnd`
+         */
+        this.position = 'beforeend';
         this.strict = false;
         this.initialRender = false;
+        /**@internal */
         this.currentTarget = unset;
     }
+    /**@internal */
     static getTarget(target, context) {
         if (target) {
             if (typeof target === 'string') {
@@ -52,6 +74,22 @@ let Portal = Portal_1 = class Portal {
         }
         return null;
     }
+    /**@internal */
+    static createViewSlot(position, target) {
+        if (typeof position !== 'string' || validPositions[position.toLowerCase()] !== 1) {
+            throw new Error('Invalid position for portalling. Expected one of "beforebegin", "afterbegin", "beforeend" or "afterend".');
+        }
+        const anchorCommentHolder = document.createElement('portal-placeholder');
+        const normalizedPosition = position.toLowerCase();
+        target.insertAdjacentElement(normalizedPosition, anchorCommentHolder);
+        const anchorComment = document.createComment('portal');
+        // If the position is beforeBegin or aftrEnd,
+        // then anchorCommentHolder wont be a child of target
+        // In all situations, it's always correct to use anchorCommentHolder rather than target
+        anchorCommentHolder.parentNode.replaceChild(anchorComment, anchorCommentHolder);
+        return new ViewSlot(anchorComment, false);
+    }
+    /**@internal */
     bind(bindingContext, overrideContext) {
         if (!this.callbackContext) {
             this.callbackContext = bindingContext;
@@ -69,16 +107,19 @@ let Portal = Portal_1 = class Portal {
             this.originalViewslot.remove(view);
         }
     }
+    /**@internal*/
     attached() {
         this.isAttached = true;
         return this.render();
     }
+    /**@internal */
     detached() {
         this.isAttached = false;
         if (this.viewSlot) {
             this.viewSlot.detached();
         }
     }
+    /**@internal */
     unbind() {
         if (this.viewSlot) {
             this.viewSlot.remove(this.view);
@@ -87,6 +128,7 @@ let Portal = Portal_1 = class Portal {
         this.view.unbind();
         this.callbackContext = null;
     }
+    /**@internal */
     getTarget() {
         let target = Portal_1.getTarget(this.target, this.renderContext);
         if (target === null) {
@@ -99,6 +141,7 @@ let Portal = Portal_1 = class Portal {
         }
         return target;
     }
+    /**@internal */
     render() {
         const oldTarget = this.currentTarget;
         const view = this.view;
@@ -107,13 +150,13 @@ let Portal = Portal_1 = class Portal {
         if (oldTarget === target && oldViewSlot) {
             return;
         }
-        let addAction = () => {
+        const addAction = () => {
             if (this.isAttached) {
                 return Promise.resolve(typeof this.activating === 'function'
                     ? this.activating.call(this.callbackContext, target, view)
                     : null).then(() => {
                     if (target === this.currentTarget || oldTarget === unset) {
-                        const viewSlot = this.viewSlot = new ViewSlot(target, true);
+                        const viewSlot = this.viewSlot = Portal_1.createViewSlot(this.position, target); // new ViewSlot(target!, true);
                         viewSlot.attached();
                         viewSlot.add(view);
                         this.removed = false;
@@ -144,12 +187,14 @@ let Portal = Portal_1 = class Portal {
         }
         return Promise.resolve(addAction());
     }
+    /**@internal */
     targetChanged() {
         return this.render();
     }
 };
 /**
  * Only needs the BoundViewFactory as a custom viewslot will be used
+ * @internal
  */
 Portal.inject = [BoundViewFactory, ViewSlot];
 __decorate([
@@ -158,6 +203,9 @@ __decorate([
         defaultValue: null
     })
 ], Portal.prototype, "target", void 0);
+__decorate([
+    bindable({ changeHandler: 'targetChanged' })
+], Portal.prototype, "position", void 0);
 __decorate([
     bindable({ changeHandler: 'targetChanged' })
 ], Portal.prototype, "renderContext", void 0);
@@ -187,10 +235,9 @@ Portal = Portal_1 = __decorate([
     customAttribute('portal')
 ], Portal);
 const unset = {};
-var Portal_1;
 
 function configure(frameworkConfig) {
     frameworkConfig.globalResources(Portal);
 }
 
-export { configure, Portal };
+export { Portal, configure };
