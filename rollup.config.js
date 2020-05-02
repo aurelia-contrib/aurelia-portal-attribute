@@ -7,6 +7,7 @@ function configRollup(isProduction) {
       file: 'dist/es2015/index.js',
       format: 'es'
     },
+    external: ['aurelia-templating', 'aurelia-pal', 'aurelia-binding'],
     plugins: [
       typescript({
         useTsconfigDeclarationDir: true,
@@ -29,6 +30,7 @@ function configRollup(isProduction) {
         { file: 'dist/amd/index.js', format: 'amd', amd: { id: `aurelia-portal-attribute` } },
         { file: 'dist/native-modules/index.js', format: 'es' }
       ],
+      external: ['aurelia-templating', 'aurelia-pal', 'aurelia-binding'],
       plugins: [
         typescript({
           tsconfigOverride: {
